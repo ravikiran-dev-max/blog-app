@@ -25,21 +25,24 @@ app.use("/user-api",userApp)
 app.use("/author-api",authorApp)
 app.use("/admin-api",adminApp)
 app.use("/auth",commonApp)
+const port = process.env.PORT || 6000;
+app.listen(port, () => console.log(`Server listening on ${port}....`));
+
 //connect to db
-const connectDB=async()=>{
-    try{
-        await connect(process.env.DB_URL)
-        console.log("DB connected")
-        //assign port
-        const port=process.env.PORT || 6000
-        app.listen(port,()=> console.log(`Server listening on ${port}....`))
-    }
-    catch(err){
-        console.log("Error in connecting to database:",err)
+const connectDB = async () => {
+    try {
+        if (!process.env.DB_URL) {
+            console.error("CRITICAL: DB_URL is not defined in environment variables");
+            return;
+        }
+        await connect(process.env.DB_URL);
+        console.log("DB connected");
+    } catch (err) {
+        console.log("Error in connecting to database:", err);
     }
 }
 
-connectDB()
+connectDB();
 
 //to handle invalid path
 app.use((req,res,next)=>{
